@@ -1,24 +1,38 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useCallback, useState} from 'react';
+import {useRecoilValue} from 'recoil';
+
+import AddressBar from 'components/address_bar';
+import ConnectionsList from 'components/connections_list';
+import LogViewer from 'components/log_viewer';
+import {connectionsState} from 'state/connections';
+
+import './app.css';
 
 function App() {
+  const [selectedConnection, setSelectedConnection] = useState(0);
+
+  const connections = useRecoilValue(connectionsState);
+
+  const onConnectionClick = useCallback((id) => {
+    setSelectedConnection(id);
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <AddressBar />
+      <div className="content">
+        <ConnectionsList
+          onConnectionClick={onConnectionClick}
+          selectedConnection={selectedConnection}
+        />
+        {Object.values(connections).map((c) => (
+          <LogViewer
+            key={c.id}
+            connectionId={c.id}
+            show={selectedConnection === c.id}
+          />
+        ))}
+      </div>
     </div>
   );
 }
